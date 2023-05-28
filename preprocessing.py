@@ -54,17 +54,6 @@ class Prepocessing:
 
     def GetDataframe(self) -> pd.DataFrame:
         return self.dataframe
-    
-    def MethodStep(self) -> list[tuple[str, callable]]:
-        return [
-            ("Data Cleansing", self.DataCleansing),
-            ("Case Folding", self.CaseFolding),
-            ("Slang Word", self.SlangWord),
-            ("Tokenizing", self.Tokenizing),
-            ("Stopword", self.Stopword),
-            ("Stemming", self.Stemming),
-            ("Done!", self.GetDataframe)
-        ]
 
 file = None 
 file = st.file_uploader("Upload Dataset", type=["csv", "xlsx"])
@@ -75,9 +64,19 @@ if file is not None:
     prep = Prepocessing(fc.checkpoint.GetDataframe().copy())
     res = None
     placeholder = st.empty()
-    for step in prep.MethodStep():
+    method_step: list[tuple[str, callable]] = [
+        ("Data Cleansing", prep.DataCleansing),
+        ("Case Folding", prep.CaseFolding),
+        ("Slang Word", prep.SlangWord),
+        ("Tokenizing", prep.Tokenizing),
+        ("Stopword", prep.Stopword),
+        ("Stemming", prep.Stemming),
+        ("Done!", prep.GetDataframe)
+    ]
+    for step in method_step:
         with placeholder.container():
             st.write(step[0])
             res = step[1]()
     st.dataframe(res)
     fc.checkpoint.SetDataframe(res)
+    fc.checkpoint.Cache(fc.PREPROCESSING_CHECKPOINT)
