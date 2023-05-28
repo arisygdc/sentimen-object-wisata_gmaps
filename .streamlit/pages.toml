@@ -1,14 +1,14 @@
 [[pages]]
 path = "preprocessing.py"
-name = "Word Cloud"
+name = "Preprocessing"
 icon = "💉"
 
 [[pages]]
-path = "naive_bayes/tf-idf.py"
+path = "tf-idf.py"
 name = "TF IDF"
 icon = "💉"
 
 [[pages]]
-path = "naive_bayes/tf-rf.py"
+path = "tf-rf.py"
 name = "TF RF"
 icon = "💉"
