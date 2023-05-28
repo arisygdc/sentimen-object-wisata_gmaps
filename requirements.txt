@@ -2,6 +2,7 @@ pandas
 numpy
 Sastrawi
 streamlit
+openpyxl
 nltk
 st_pages
 seaborn
