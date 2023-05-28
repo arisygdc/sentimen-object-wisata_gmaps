@@ -9,6 +9,8 @@ from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.corpus import stopwords
 
+show_pages_from_config()
+
 if not sys.warnoptions:
     import warnings
     warnings.simplefilter("ignore")
