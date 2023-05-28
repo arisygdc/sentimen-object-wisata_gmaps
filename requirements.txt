@@ -1,0 +1,8 @@
+pandas
+numpy
+Sastrawi
+streamlit
+nltk
+st_pages
+seaborn
+scikit-learn

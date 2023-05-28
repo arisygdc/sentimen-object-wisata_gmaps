@@ -1,0 +1,14 @@
+[[pages]]
+path = "preprocessing.py"
+name = "Word Cloud"
+icon = "💉"
+
+[[pages]]
+path = "naive_bayes/tf-idf.py"
+name = "TF IDF"
+icon = "💉"
+
+[[pages]]
+path = "naive_bayes/tf-rf.py"
+name = "TF RF"
+icon = "💉"
