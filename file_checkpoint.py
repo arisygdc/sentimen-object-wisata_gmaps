@@ -8,7 +8,11 @@ class _FileCheckpoint:
         self.dataframe = data
         
     def CheckDataframe(self) -> bool:
-        return self.dataframe is not None
+        DataframeInitialized = self.dataframe is not None
+        if not DataframeInitialized:
+            return DataframeInitialized
+        IsNotEmptyDataframe = not self.dataframe.empty
+        return IsNotEmptyDataframe
     
     def GetDataframe(self) -> pd.DataFrame:
         return self.dataframe
