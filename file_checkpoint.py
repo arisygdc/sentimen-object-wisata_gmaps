@@ -6,8 +6,11 @@ class _FileCheckpoint:
 
     def SetDataframe(self, data: pd.DataFrame):
         self.dataframe = data
+        
+    def CheckDataframe(self) -> bool:
+        return self.dataframe is not None
     
-    def GetDataframe(self) -> pd.DataFrame | None:
+    def GetDataframe(self) -> pd.DataFrame:
         return self.dataframe
 
 checkpoint = _FileCheckpoint()

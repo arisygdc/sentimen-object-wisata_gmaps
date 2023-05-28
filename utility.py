@@ -1,5 +1,6 @@
-import unicodedata, re
+import unicodedata, re, os
 import pandas as pd
+from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 
 def Data_Cleansing(text):
     # Hapus non-ascii
@@ -61,3 +62,24 @@ class Stopword:
     
     def execute(self, words):
         return [word for word in words if word not in self.list_stopword]
+
+def RunSlang(path, dataframe: pd.DataFrame) -> pd.DataFrame:
+    slang_obj = SlangWords()
+    SlangFileList_Path = os.getcwd()+"/"+path
+    dir = os.listdir(SlangFileList_Path)
+    for val in reversed(dir):
+        file = SlangFileList_Path+"/"+val
+        if val.endswith(".csv"):
+            slang_obj.ReadCsv(file)
+        if val.endswith(".xlsx"):
+            slang_obj.ReadExcel(file)
+        dataframe['slang_word'] = dataframe['Case_Folding'].apply(slang_obj.Slangwords)
+    return dataframe
+
+class Stemmer:
+    def __init__(self):
+        factory = StemmerFactory()
+        self.stemmer = factory.create_stemmer()
+    
+    def stem(self, words):
+        return [self.stemmer.stem(word) for word in words]
