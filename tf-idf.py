@@ -1,7 +1,7 @@
-import file_checkpoint as fc
-import pandas as pd
 import streamlit as st
-import utility as ut
+import file_checkpoint as fc, utility as ut
+import pandas as pd
+import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split, cross_validate, KFold
 from sklearn.preprocessing import LabelEncoder
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -18,9 +18,7 @@ def tf_idf(selected_key: str, df: pd.DataFrame):
     
     # Train Test Split
     X=df['teks_remove']
-    st.write(X)
     y=df['label']
-    st.write(y)
     X_train,X_test,y_train,y_test = train_test_split(
         X,y,
         test_size=selected_value[selected_key][0],
@@ -51,10 +49,22 @@ def tf_idf(selected_key: str, df: pd.DataFrame):
     clf = MultinomialNB().fit(Train_X_Tfidf.toarray(), y_train)
     predicted = clf.predict(Train_X_Tfidf.toarray())
 
-    sns.heatmap(confusion_matrix(y_train, predicted), annot=True,cmap='Blues')
+    #  Training
+    fig, ax = plt.subplots()
+    sns.heatmap(confusion_matrix(y_train, predicted), annot=True,cmap='Blues', ax=ax)
     st.write("MultinomialNB Accuracy:" , accuracy_score(y_train,predicted))
+    st.write(fig)
+
+    # Testing
+    clf = MultinomialNB().fit(Train_X_Tfidf.toarray(), y_train)
+    predicted = clf.predict(Test_X_Tfidf.toarray())
+    fig, ax = plt.subplots()
+    sns.heatmap(confusion_matrix(y_test, predicted), annot=True,cmap='Blues', ax=ax)
+    st.write("MultinomialNB Accuracy:" , accuracy_score(y_test,predicted))
+    st.write(fig)
 
     # Training
+    columns = ['accuracy', 'precision', 'recall', 'f1_score']
     cv_train = cross_validate(
         estimator=MultinomialNB(),
         X=Train_X_Tfidf.toarray(),
@@ -65,14 +75,14 @@ def tf_idf(selected_key: str, df: pd.DataFrame):
     
     # Testing
     df_cv_train = pd.DataFrame({
-            'akurasi':cv_train['test_accuracy'],
-            'presisi':cv_train['test_precision_weighted'],
-            'recall':cv_train['test_recall_weighted'],
-            'f1_score':cv_train['test_f1_weighted']
+            columns[0]:cv_train['test_accuracy'],
+            columns[1]:cv_train['test_precision_weighted'],
+            columns[2]:cv_train['test_recall_weighted'],
+            columns[3]:cv_train['test_f1_weighted']
     })
     
+    st.write("Training overview")
     st.write(df_cv_train*100)
-    st.write(df_cv_train.mean()*100)
 
     cv_test = cross_validate(
         estimator=MultinomialNB(),
@@ -83,14 +93,21 @@ def tf_idf(selected_key: str, df: pd.DataFrame):
     )
     
     df_cv_test = pd.DataFrame({
-        'akurasi':cv_test['test_accuracy'],
-        'presisi':cv_test['test_precision_weighted'],
-        'recall':cv_test['test_recall_weighted'],
-        'f1_score':cv_test['test_f1_weighted']
+        columns[0]:cv_test['test_accuracy'],
+        columns[1]:cv_test['test_precision_weighted'],
+        columns[2]:cv_test['test_recall_weighted'],
+        columns[3]:cv_test['test_f1_weighted']
     })
     
+    st.write("Testing overview")
     st.write(df_cv_test*100)
-    st.write(df_cv_test.mean()*100)
+
+    index = (df_cv_test.mean()*100).index.tolist()
+    training_series = (df_cv_train.mean()*100).tolist()
+    testing_series = (df_cv_test.mean()*100).tolist()
+    reader = pd.DataFrame([training_series, testing_series], index=['Training', 'Testing'], columns=index)
+    st.write("Mean of Training and Testing")
+    st.write(reader)
 
 selected_value = {
     "50_50":(0.5,110), 
