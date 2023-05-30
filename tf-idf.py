@@ -9,8 +9,8 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.metrics import confusion_matrix, accuracy_score
 import seaborn as sns
 
-if fc.checkpoint.CheckDataframe():
-    df = fc.checkpoint.GetDataframe().copy()
+def tf_idf(selected_key: str, df: pd.DataFrame):
+    st.write("Hasil Preprocessing")
     st.write(df)
     df['teks_remove'] = df['teks_remove'].apply(ut.satu)
     _ = df[df['teks_remove'].str.isspace()==True].index
@@ -18,8 +18,14 @@ if fc.checkpoint.CheckDataframe():
     
     # Train Test Split
     X=df['teks_remove']
+    st.write(X)
     y=df['label']
-    X_train,X_test,y_train,y_test = train_test_split(X,y,test_size = 0.5,random_state = 110)
+    st.write(y)
+    X_train,X_test,y_train,y_test = train_test_split(
+        X,y,
+        test_size=selected_value[selected_key][0],
+        random_state=selected_value[selected_key][1]
+    )
     
     # Label Encoder TF-IDF
     Encoder = LabelEncoder()
@@ -48,13 +54,63 @@ if fc.checkpoint.CheckDataframe():
     sns.heatmap(confusion_matrix(y_train, predicted), annot=True,cmap='Blues')
     st.write("MultinomialNB Accuracy:" , accuracy_score(y_train,predicted))
 
-    cv_train = cross_validate(estimator=MultinomialNB(),
-                          X=Train_X_Tfidf.toarray(),
-                          y=y_train,
-                          cv=KFold(n_splits=10),
-                          scoring=(('accuracy','precision_weighted', 'recall_weighted', 'f1_weighted')))
+    # Training
+    cv_train = cross_validate(
+        estimator=MultinomialNB(),
+        X=Train_X_Tfidf.toarray(),
+        y=y_train,
+        cv=KFold(n_splits=10),
+        scoring=(('accuracy','precision_weighted', 'recall_weighted', 'f1_weighted'))
+    )
     
-    df_cv_train = pd.DataFrame({'akurasi':cv_train['test_accuracy'],
-                            'presisi':cv_train['test_precision_weighted'],
-                            'recall':cv_train['test_recall_weighted'],
-                            'f1_score':cv_train['test_f1_weighted']})
+    # Testing
+    df_cv_train = pd.DataFrame({
+            'akurasi':cv_train['test_accuracy'],
+            'presisi':cv_train['test_precision_weighted'],
+            'recall':cv_train['test_recall_weighted'],
+            'f1_score':cv_train['test_f1_weighted']
+    })
+    
+    st.write(df_cv_train*100)
+    st.write(df_cv_train.mean()*100)
+
+    cv_test = cross_validate(
+        estimator=MultinomialNB(),
+        X=Test_X_Tfidf.toarray(),
+        y=y_test,
+        cv=KFold(n_splits=10),
+        scoring=(('accuracy','precision_weighted', 'recall_weighted', 'f1_weighted'))
+    )
+    
+    df_cv_test = pd.DataFrame({
+        'akurasi':cv_test['test_accuracy'],
+        'presisi':cv_test['test_precision_weighted'],
+        'recall':cv_test['test_recall_weighted'],
+        'f1_score':cv_test['test_f1_weighted']
+    })
+    
+    st.write(df_cv_test*100)
+    st.write(df_cv_test.mean()*100)
+
+selected_value = {
+    "50_50":(0.5,110), 
+    "60_40":(0.4, 42), 
+    "70_30":(0.3, 42), 
+    "80_20":(0.2, 42)
+}
+
+select_state = None
+selected = st.selectbox("TFIDF",selected_value.keys())
+placeholder = st.empty()
+init_df = True
+
+if not fc.checkpoint.CheckDataframe():
+    init_df = False
+    with placeholder.container():
+        st.write("Dataframe not initialized")
+
+if init_df:
+    if select_state != selected:
+        select_state = selected
+        with placeholder.container():
+            tf_idf(selected, fc.checkpoint.GetDataframe().copy())
