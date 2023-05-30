@@ -1,6 +1,7 @@
-import unicodedata, re, os
-import pandas as pd
+import unicodedata, re, os, math
+import pandas as pd, numpy as np
 from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
+from nltk.tokenize import word_tokenize
 
 def Data_Cleansing(text):
     # Hapus non-ascii
@@ -83,3 +84,46 @@ class Stemmer:
     
     def stem(self, words):
         return [self.stemmer.stem(word) for word in words]
+    
+def TF_RF(df_teks):
+    # Membuat list kosa kata dari seluruh teks input
+    kosa_kata = set()
+    for i in df_teks:
+        token_kal=set(word_tokenize(i.lower()))
+        kosa_kata=set.union(kosa_kata,token_kal)
+    kosa_kata = sorted(kosa_kata)
+    # Membuat dictionary kata-kata
+    indeks_kata = {}
+    for kata in kosa_kata:
+        indeks_kata[kata] = 0
+    # Jumlah kosa kata(untuk kolom)
+    jumlah_kosa_kata = len(kosa_kata)
+    # Membangun matriks kata TF
+    vektor_TF=np.array([])
+    for baris_teks in df_teks:
+        baris_kata = indeks_kata.copy()
+        split_baris = baris_teks.lower().split()
+        for kata in baris_teks.lower().split():
+            baris_kata[kata]=+1
+        baris_kata = np.array(list(baris_kata.values()))
+        baris_kata = baris_kata/len(split_baris)
+        vektor_TF = np.concatenate((vektor_TF,baris_kata), axis=0)
+    matriks_TF = vektor_TF[:1230341].reshape(df_teks.shape[0], jumlah_kosa_kata)
+    # Membagun dataframe kata TF
+    df_TF = pd.DataFrame(matriks_TF, columns=kosa_kata, index=df_teks.tolist())
+    # Menghitung baris RF
+    baris_RF=[]
+    for kolom in df_TF.columns :
+        b = len(df_TF[df_TF[kolom]>0])
+        c = len(df_TF)-b
+        baris_rf = (math.log10(2+(b/c)))  
+        baris_RF.append(baris_rf)
+    # Membuat matriks TF-RF
+    vektor_TFRF=np.array([])
+    for baris in matriks_TF:
+        baris_tfrf=np.multiply(baris,baris_RF)
+        vektor_TFRF=np.concatenate((vektor_TFRF,baris_tfrf), axis=0)
+    matriks_TFRF = vektor_TFRF[:1230341].reshape(df_teks.shape[0], jumlah_kosa_kata)
+    # Membuat dataframe TF-RF
+    df_TF_RF = pd.DataFrame(matriks_TFRF, columns=kosa_kata, index=df_teks.tolist())
+    return df_TF_RF
