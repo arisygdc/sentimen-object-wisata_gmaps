@@ -29,3 +29,15 @@ LIST_HAPUS_CORPUS = [
     'tampak','tampaknya','tentu','tentulah','tentunya','tepat','terasa','terbanyak',
     'teringat','teringat-ingat', 'tidak','tidakkah','tidaklah','tinggi'
 ]
+
+def split_word2(teks):
+    temp = teks.split() # split words
+    temp = " ".join(word for word in temp) # join all words
+
+    return temp
+
+def split_word(teks):
+    list_teks = []
+    for txt in teks.split(" "):
+        list_teks.append(txt)
+    return list_teks

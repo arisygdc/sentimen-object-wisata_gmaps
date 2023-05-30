@@ -5,6 +5,8 @@ import numpy as np
 import utility as ut
 import sys, nltk, helper.words as w
 from nltk.corpus import stopwords
+from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
+import concurrent.futures
 
 if not sys.warnoptions:
     import warnings
@@ -30,7 +32,7 @@ class Prepocessing:
         self.dataframe = ut.RunSlang("dataset/slang_word", self.dataframe)
     
     def Tokenizing(self):
-        self.dataframe['Tokenizing'] = self.dataframe['slang_word'].apply(ut.split_word)
+        self.dataframe['Tokenizing'] = self.dataframe['slang_word'].apply(w.split_word)
     
     def Stopword(self):
         nltk.download('words')
@@ -43,14 +45,46 @@ class Prepocessing:
 
         list_stopword = set(list_stopword)
         stopword_obj = ut.Stopword(list_stopword)
-        self.dataframe['Stopword'] = self.dataframe['Tokenizing'].apply(stopword_obj.execute)
+        self.dataframe['Stopword'] = self.dataframe['Tokenizing'].apply(stopword_obj.execute)    
+
+    def _stem(self, start: int, end: int):
+        factory = StemmerFactory()
+        stemmer = factory.create_stemmer()
+        return self.dataframe['Stopword'][start:end].apply(
+        lambda x: [
+            stemmer.stem(word) 
+            for word in x
+        ])
+        
     
     def Stemming(self):
-        stemmer = ut.Stemmer()
-        self.dataframe['Stemming'] = self.dataframe['Stopword'].apply(lambda x: stemmer.stem(x))
-        self.dataframe['teks_remove'] = self.dataframe['Stemming'].apply(ut.satu)
-        self.dataframe['teks_remove'] = self.dataframe['teks_remove'].str.findall('\w{2,}').str.join(' ').apply(ut.split_word)
+        MAX_WORKERS = 4
+        data_amount = self.dataframe['Stopword'].count()
+        MaxPerThread = data_amount // MAX_WORKERS
+        loopRange = data_amount // MaxPerThread
+        if data_amount % MaxPerThread != 0:
+            loopRange += 1
+        res = [None] * loopRange
+        pool = concurrent.futures.ProcessPoolExecutor(max_workers=MAX_WORKERS)
 
+        self.dataframe['Stemming'] = ""
+        for i in range(loopRange):
+            start = i * MaxPerThread
+            end = start + MaxPerThread
+            if end > data_amount:
+                end = data_amount
+            res[i]=pool.submit(self._stem, start, end)
+
+        for i in range(loopRange):
+            start = i * MaxPerThread
+            end = start + MaxPerThread
+            if end > data_amount:
+                end = data_amount
+            self.dataframe['Stemming'][start:end] = res[i].result()
+        pool.shutdown(wait=True)
+        self.dataframe['teks_remove'] = self.dataframe['Stemming'].apply(ut.satu)
+        self.dataframe['teks_remove'] = self.dataframe['teks_remove'].str.findall('\w{2,}').str.join(' ').apply(w.split_word)
+        
     def GetDataframe(self) -> pd.DataFrame:
         return self.dataframe
 
