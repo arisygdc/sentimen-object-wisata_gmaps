@@ -4,6 +4,11 @@ name = "Preprocessing"
 icon = "💉"
 
 [[pages]]
+path = "wordcloud.py"
+name = "Word Cloud"
+icon = "💉"
+
+[[pages]]
 path = "tf-idf.py"
 name = "TF IDF"
 icon = "💉"
