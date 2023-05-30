@@ -3,7 +3,7 @@ numpy
 Sastrawi
 streamlit
 openpyxl
-# nltk require python version < 3.9
+# nltk require python version < 3.10
 nltk
 st_pages
 seaborn
