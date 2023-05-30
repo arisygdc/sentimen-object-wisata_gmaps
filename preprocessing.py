@@ -4,7 +4,6 @@ import file_checkpoint as fc
 import numpy as np
 import utility as ut
 import sys, nltk, helper.words as w
-# from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.corpus import stopwords
 
 if not sys.warnoptions:
@@ -77,6 +76,5 @@ if file is not None:
         with placeholder.container():
             st.write(step[0])
             res = step[1]()
+    fc.checkpoint.SetDataframe(res.copy())
     st.dataframe(res)
-    fc.checkpoint.SetDataframe(res)
-    fc.checkpoint.Cache(fc.PREPROCESSING_CHECKPOINT)
