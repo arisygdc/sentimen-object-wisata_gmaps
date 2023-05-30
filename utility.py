@@ -28,6 +28,11 @@ def satu(teks):
   text = (" ").join(teks)
   return text
 
+def PrepareDataframe(df: pd.DataFrame):
+    df['teks_remove'] = df['teks_remove'].apply(satu)
+    _=df[df['teks_remove'].str.isspace()==True].index
+    df = df.drop(df.index[[25, 59, 211, 212, 220, 268, 301, 312, 325, 360]])
+
 class SlangWords:
     def __init__(self):
         self.dict = {}
@@ -51,18 +56,12 @@ class SlangWords:
                 text = text.replace(word, self.dict[word])
         return text
 
-def split_word(teks):
-    list_teks = []
-    for txt in teks.split(" "):
-        list_teks.append(txt)
-    return list_teks
-
 class Stopword:
     def __init__(self, list_stopword: set):
         self.list_stopword = list_stopword
     
     def execute(self, words):
-        return [word for word in words if word not in self.list_stopword]
+        return [word for word in words if word not in self.list_stopword]   
 
 def RunSlang(path, dataframe: pd.DataFrame) -> pd.DataFrame:
     slang_obj = SlangWords()
@@ -76,14 +75,6 @@ def RunSlang(path, dataframe: pd.DataFrame) -> pd.DataFrame:
             slang_obj.ReadExcel(file)
         dataframe['slang_word'] = dataframe['Case_Folding'].apply(slang_obj.Slangwords)
     return dataframe
-
-class Stemmer:
-    def __init__(self):
-        factory = StemmerFactory()
-        self.stemmer = factory.create_stemmer()
-    
-    def stem(self, words):
-        return [self.stemmer.stem(word) for word in words]
     
 def TF_RF(df_teks):
     # Membuat list kosa kata dari seluruh teks input

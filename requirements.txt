@@ -3,7 +3,9 @@ numpy
 Sastrawi
 streamlit
 openpyxl
+# nltk require python version < 3.9
 nltk
 st_pages
 seaborn
 scikit-learn
+wordcloud

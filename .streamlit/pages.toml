@@ -4,7 +4,7 @@ name = "Preprocessing"
 icon = "💉"
 
 [[pages]]
-path = "wordcloud.py"
+path = "wordcloud_fig.py"
 name = "Word Cloud"
 icon = "💉"
 
