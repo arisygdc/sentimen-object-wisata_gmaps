@@ -121,6 +121,6 @@ if file is not None:
         with placeholder.container():
             st.write(step[0])
             res = step[1]()
-    # fc.checkpoint.SetDataframe(res.copy())
+    fc.checkpoint.SetDataframe(res.copy())
     st.dataframe(res)
     del res
