@@ -48,16 +48,6 @@ class Prepocessing:
         stopword_obj = ut.Stopword(list_stopword)
         self.dataframe['Stopword'] = self.dataframe['Tokenizing'].apply(stopword_obj.execute)    
 
-    def _stem(dataSeries: pd.Series):
-        bench = time.perf_counter()
-        factory = StemmerFactory()
-        stemmer = factory.create_stemmer()
-        return [dataSeries.apply(
-        lambda x: [
-            stemmer.stem(word) 
-            for word in x
-        ]), time.perf_counter()-bench]
-    
     def Stemming(self):
         MAX_WORKERS = 4
         DataAmount = self.dataframe['Stopword'].count()
@@ -69,7 +59,7 @@ class Prepocessing:
 
         self.dataframe['Stemming'] = ""
         stemProcessVerbose = st.empty()
-        bench = time.perf_counter()
+        
         for i in range(loopRange):
             start = i * MaxPerProccess
             end = start + MaxPerProccess
@@ -88,10 +78,7 @@ class Prepocessing:
                 st.write(f"Time taken for {i+1} is {res[i].result()[1]}")
                 st.write(f"Start: {start}, End: {end}, Data Carry: {end-start}")
 
-        timesTaken = time.perf_counter()-bench
         stemProcessVerbose.empty()
-        st.write(f"Total time taken: {timesTaken}")
-        st.write("Hasil Preprocessing")
         pool.shutdown(wait=True)
         self.dataframe['teks_remove'] = self.dataframe['Stemming'].apply(ut.satu)
         self.dataframe['teks_remove'] = self.dataframe['teks_remove'].str.findall('\w{2,}').str.join(' ').apply(w.split_word)
@@ -117,10 +104,18 @@ if file is not None:
         ("Stemming", prep.Stemming),
         ("Done!", prep.GetDataframe)
     ]
+
+    bench = time.perf_counter()
     for step in method_step:
         with placeholder.container():
             st.write(step[0])
             res = step[1]()
+
+    with st.empty():
+        timesTaken = time.perf_counter() - bench
+        st.write(f"Total time taken: {timesTaken}")
+        st.write("Hasil Preprocessing")
+        st.dataframe(res)
+    
     fc.checkpoint.SetDataframe(res.copy())
-    st.dataframe(res)
     del res
