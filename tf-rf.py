@@ -31,12 +31,27 @@ def tf_rf(selected, df):
     nltk.download('punkt')
     df_TF_RF=ut.TF_RF(df['teks_remove'])
     
+    iterator = 0
+    invalid_rows = []
+    for index, row in df_TF_RF.iterrows():
+        if row.isnull().any():
+            invalid_rows.append((index, iterator))
+        iterator += 1
+    st.write("Invalid Rows")
+    st.write(invalid_rows)
+
+    for i in range(len(invalid_rows)):
+        df_TF_RF.drop(invalid_rows[i][0], inplace=True)
+        df.drop(invalid_rows[i][1], inplace=True)
+
     st.write("Hasil TF-RF")
     st.write(df_TF_RF)
 
     le = LabelEncoder()
     X = df_TF_RF
     y = le.fit_transform(df['label'])
+    st.write("Label Encoder")
+    st.write(y)
 
     Train_X_Tfrf,Test_X_Tfrf,y_train,y_test = train_test_split(
         X,y,
