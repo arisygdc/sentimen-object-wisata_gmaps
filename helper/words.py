@@ -30,6 +30,10 @@ LIST_HAPUS_CORPUS = [
     'teringat','teringat-ingat', 'tidak','tidakkah','tidaklah','tinggi'
 ]
 
+import pandas as pd
+import time
+from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
+
 def split_word2(teks):
     temp = teks.split() # split words
     temp = " ".join(word for word in temp) # join all words
@@ -41,3 +45,13 @@ def split_word(teks):
     for txt in teks.split(" "):
         list_teks.append(txt)
     return list_teks
+
+def stem(dataSeries: pd.Series):
+    bench = time.perf_counter()
+    factory = StemmerFactory()
+    stemmer = factory.create_stemmer()
+    return [dataSeries.apply(
+    lambda x: [
+        stemmer.stem(word) 
+        for word in x
+    ]), time.perf_counter()-bench]

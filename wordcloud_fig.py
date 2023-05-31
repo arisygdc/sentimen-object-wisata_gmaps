@@ -121,5 +121,8 @@ if init_df:
 
         fig = wordOnNegativeSentiment(kata_negatif)
         st.write(fig)
+        del kata_positif, kata_negatif
+        del fig
+        del df
 
 
