@@ -7,6 +7,7 @@ import sys, nltk, helper.words as w
 from nltk.corpus import stopwords
 from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 import concurrent.futures
+import time
 
 if not sys.warnoptions:
     import warnings
@@ -47,40 +48,50 @@ class Prepocessing:
         stopword_obj = ut.Stopword(list_stopword)
         self.dataframe['Stopword'] = self.dataframe['Tokenizing'].apply(stopword_obj.execute)    
 
-    def _stem(self, start: int, end: int):
+    def _stem(dataSeries: pd.Series):
+        bench = time.perf_counter()
         factory = StemmerFactory()
         stemmer = factory.create_stemmer()
-        return self.dataframe['Stopword'][start:end].apply(
+        return [dataSeries.apply(
         lambda x: [
             stemmer.stem(word) 
             for word in x
-        ])
-        
+        ]), time.perf_counter()-bench]
     
     def Stemming(self):
         MAX_WORKERS = 4
-        data_amount = self.dataframe['Stopword'].count()
-        MaxPerThread = data_amount // MAX_WORKERS
-        loopRange = data_amount // MaxPerThread
-        if data_amount % MaxPerThread != 0:
-            loopRange += 1
+        DataAmount = self.dataframe['Stopword'].count()
+        MaxPerProccess = (DataAmount // MAX_WORKERS)
+        loopRange = DataAmount // MaxPerProccess
+        loopRange = DataAmount % MaxPerProccess != 0 and loopRange+1 or loopRange
         res = [None] * loopRange
         pool = concurrent.futures.ProcessPoolExecutor(max_workers=MAX_WORKERS)
 
         self.dataframe['Stemming'] = ""
+        stemProcessVerbose = st.empty()
+        bench = time.perf_counter()
         for i in range(loopRange):
-            start = i * MaxPerThread
-            end = start + MaxPerThread
-            if end > data_amount:
-                end = data_amount
-            res[i]=pool.submit(self._stem, start, end)
+            start = i * MaxPerProccess
+            end = start + MaxPerProccess
+            EndIndexGTDataAmount = end > DataAmount
+            end = DataAmount if EndIndexGTDataAmount else end
+            res[i]=pool.submit(w.stem, self.dataframe['Stopword'][start:end])
 
-        for i in range(loopRange):
-            start = i * MaxPerThread
-            end = start + MaxPerThread
-            if end > data_amount:
-                end = data_amount
-            self.dataframe['Stemming'][start:end] = res[i].result()
+        with stemProcessVerbose.container():
+            for i in range(loopRange):
+                start = i * MaxPerProccess
+                end = start + MaxPerProccess
+                EndIndexGTDataAmount = end > DataAmount
+                end = DataAmount if EndIndexGTDataAmount else end
+            
+                self.dataframe['Stemming'][start:end] = res[i].result()[0]
+                st.write(f"Time taken for {i+1} is {res[i].result()[1]}")
+                st.write(f"Start: {start}, End: {end}, Data Carry: {end-start}")
+
+        timesTaken = time.perf_counter()-bench
+        stemProcessVerbose.empty()
+        st.write(f"Total time taken: {timesTaken}")
+        st.write("Hasil Preprocessing")
         pool.shutdown(wait=True)
         self.dataframe['teks_remove'] = self.dataframe['Stemming'].apply(ut.satu)
         self.dataframe['teks_remove'] = self.dataframe['teks_remove'].str.findall('\w{2,}').str.join(' ').apply(w.split_word)
@@ -93,8 +104,8 @@ file = st.file_uploader("Upload Dataset", type=["csv", "xlsx"])
 if file is not None:
     read_excel = pd.read_excel(file)
     file = None
-    fc.checkpoint.SetDataframe(read_excel)
-    prep = Prepocessing(fc.checkpoint.GetDataframe().copy())
+    prep = Prepocessing(read_excel)
+    del read_excel
     res = None
     placeholder = st.empty()
     method_step: list[tuple[str, callable]] = [
@@ -110,5 +121,6 @@ if file is not None:
         with placeholder.container():
             st.write(step[0])
             res = step[1]()
-    fc.checkpoint.SetDataframe(res.copy())
+    # fc.checkpoint.SetDataframe(res.copy())
     st.dataframe(res)
+    del res
