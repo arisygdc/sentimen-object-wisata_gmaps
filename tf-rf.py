@@ -37,8 +37,6 @@ def tf_rf(selected, df):
         if row.isnull().any():
             invalid_rows.append((index, iterator))
         iterator += 1
-    st.write("Invalid Rows")
-    st.write(invalid_rows)
 
     for i in range(len(invalid_rows)):
         df_TF_RF.drop(invalid_rows[i][0], inplace=True)
