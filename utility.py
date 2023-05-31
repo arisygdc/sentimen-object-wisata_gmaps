@@ -31,7 +31,7 @@ def satu(teks):
 def PrepareDataframe(df: pd.DataFrame):
     df['teks_remove'] = df['teks_remove'].apply(satu)
     _=df[df['teks_remove'].str.isspace()==True].index
-    df = df.drop(df.index[[25, 59, 211, 212, 220, 268, 301, 312, 325, 360]])
+    return df.drop(df.index[[25, 59, 211, 212, 220, 268, 301, 312, 325, 360]])
 
 class SlangWords:
     def __init__(self):

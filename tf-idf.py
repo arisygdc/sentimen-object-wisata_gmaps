@@ -11,10 +11,8 @@ import seaborn as sns
 
 def tf_idf(selected_key: str, df: pd.DataFrame):
     st.write("Hasil Preprocessing")
+    df = ut.PrepareDataframe(df)
     st.write(df)
-    df['teks_remove'] = df['teks_remove'].apply(ut.satu)
-    _ = df[df['teks_remove'].str.isspace()==True].index
-    df = df.drop(df.index[[25, 59, 211, 212, 220, 268, 301, 312, 325, 360]])
     
     # Train Test Split
     X=df['teks_remove']

@@ -98,7 +98,7 @@ if not fc.checkpoint.CheckDataframe():
 
 if init_df:
     df = fc.checkpoint.GetDataframe().copy()
-    ut.PrepareDataframe(df)
+    df = ut.PrepareDataframe(df)
     with placeholder.container():
         st.write("Hasil Preprocessing")
         st.write(df)

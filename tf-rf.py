@@ -26,13 +26,14 @@ def tf_rf(selected, df):
     st.write("Hasil Preprocessing")
     st.write(df)
     
-    df['teks_remove'] = df['teks_remove'].apply(ut.satu)
-    _=df[df['teks_remove'].str.isspace()==True].index
-    df = df.drop(df.index[[25, 59, 211, 212, 220, 268, 301, 312, 325, 360]])
-
+    df = ut.PrepareDataframe(df)
     # Label Encoder TF-RF
     nltk.download('punkt')
     df_TF_RF=ut.TF_RF(df['teks_remove'])
+    
+    st.write("Hasil TF-RF")
+    st.write(df_TF_RF)
+
     le = LabelEncoder()
     X = df_TF_RF
     y = le.fit_transform(df['label'])
