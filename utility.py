@@ -1,6 +1,5 @@
 import unicodedata, re, os, math
 import pandas as pd, numpy as np
-from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 from nltk.tokenize import word_tokenize
 
 def Data_Cleansing(text):
