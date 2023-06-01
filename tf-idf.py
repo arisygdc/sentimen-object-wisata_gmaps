@@ -50,7 +50,7 @@ def tf_idf(selected_key: str, df: pd.DataFrame):
     #  Training
     fig, ax = plt.subplots()
     sns.heatmap(confusion_matrix(y_train, predicted), annot=True,cmap='Blues', ax=ax)
-    st.write("MultinomialNB Accuracy:" , accuracy_score(y_train,predicted))
+    st.write("MultinomialNB Training Accuracy:" , accuracy_score(y_train,predicted))
     st.write(fig)
 
     # Testing
@@ -58,7 +58,7 @@ def tf_idf(selected_key: str, df: pd.DataFrame):
     predicted = clf.predict(Test_X_Tfidf.toarray())
     fig, ax = plt.subplots()
     sns.heatmap(confusion_matrix(y_test, predicted), annot=True,cmap='Blues', ax=ax)
-    st.write("MultinomialNB Accuracy:" , accuracy_score(y_test,predicted))
+    st.write("MultinomialNB Testing Accuracy:" , accuracy_score(y_test,predicted))
     st.write(fig)
 
     # Training
