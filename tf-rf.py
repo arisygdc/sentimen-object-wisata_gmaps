@@ -18,7 +18,7 @@ selected_value = {
 }
 
 select_state = None
-selected = st.selectbox("TFIDF",selected_value.keys())
+selected = st.selectbox("TFRF",selected_value.keys())
 placeholder = st.empty()
 init_df = True
 
@@ -63,51 +63,44 @@ def tf_rf(selected, df):
 
     fig, ax = plt.subplots()
     sns.heatmap(confusion_matrix(y_train, predicted), annot=True,cmap='Blues', ax=ax)
-    st.write("MultinomialNB Accuracy:" , accuracy_score(y_train,predicted))
+    st.write("MultinomialNB Training Accuracy:" , accuracy_score(y_train,predicted))
     st.write(fig)
 
     # Testing
     clf = MultinomialNB().fit(Train_X_Tfrf, y_train)
     predicted = clf.predict(Test_X_Tfrf)
+
     fig, ax = plt.subplots()
     sns.heatmap(confusion_matrix(y_test, predicted), annot=True,cmap='Blues', ax=ax)
-    st.write("MultinomialNB Accuracy:" , accuracy_score(y_train,predicted))
+    st.write("MultinomialNB Testing Accuracy:" , accuracy_score(y_test,predicted))
     st.write(fig)
 
     # K-Fold
-    columns = ['accuracy', 'precision', 'recall', 'f1_score']
-    cv_train = cross_validate(
-        estimator=MultinomialNB(),
-        X=Test_X_Tfrf,
-        y=y_train,
-        cv=KFold(n_splits=10),
-        scoring=(('accuracy','precision_weighted', 'recall_weighted', 'f1_weighted'))
-    )
-
-    df_cv_train = pd.DataFrame({
-            columns[0]:cv_train['test_accuracy'],
-            columns[1]:cv_train['test_precision_weighted'],
-            columns[2]:cv_train['test_recall_weighted'],
-            columns[3]:cv_train['test_f1_weighted']
-    })
+    cv_train = cross_validate(estimator=MultinomialNB(),
+                          X=Train_X_Tfrf,
+                          y=y_train,
+                          cv=KFold(n_splits=10),
+                          scoring=(('accuracy','precision_weighted', 'recall_weighted', 'f1_weighted')))
+    
+    df_cv_train = pd.DataFrame({'akurasi':cv_train['test_accuracy'],
+                            'presisi':cv_train['test_precision_weighted'],
+                            'recall':cv_train['test_recall_weighted'],
+                            'f1_score':cv_train['test_f1_weighted']})
+    
     
     st.write("Training overview")
     st.write(df_cv_train*100)
 
-    cv_test = cross_validate(
-        estimator=MultinomialNB(),
-        X=Test_X_Tfrf,
-        y=y_train,
-        cv=KFold(n_splits=10),
-        scoring=(('accuracy','precision_weighted', 'recall_weighted', 'f1_weighted'))
-    )
+    cv_test = cross_validate(estimator=MultinomialNB(),
+                         X=Test_X_Tfrf,
+                         y=y_test,
+                         cv=KFold(n_splits=10),
+                         scoring=(('accuracy','precision_weighted', 'recall_weighted', 'f1_weighted')))
     
-    df_cv_test = pd.DataFrame({
-        columns[0]:cv_test['test_accuracy'],
-        columns[1]:cv_test['test_precision_weighted'],
-        columns[2]:cv_test['test_recall_weighted'],
-        columns[3]:cv_test['test_f1_weighted']
-    })
+    df_cv_test = pd.DataFrame({'akurasi':cv_test['test_accuracy'],
+                            'presisi':cv_test['test_precision_weighted'],
+                            'recall':cv_test['test_recall_weighted'],
+                            'f1_score':cv_test['test_f1_weighted']})
     
     st.write("Testing overview")
     st.write(df_cv_test*100)
