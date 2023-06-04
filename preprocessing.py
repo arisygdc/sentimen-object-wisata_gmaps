@@ -5,7 +5,6 @@ import numpy as np
 import utility as ut
 import sys, nltk, helper.words as w
 from nltk.corpus import stopwords
-from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 import concurrent.futures
 import time
 
@@ -95,22 +94,31 @@ if file is not None:
     del read_excel
     res = None
     placeholder = st.empty()
-    method_step: list[tuple[str, callable]] = [
-        ("Data Cleansing", prep.DataCleansing),
-        ("Case Folding", prep.CaseFolding),
-        ("Slang Word", prep.SlangWord),
-        ("Tokenizing", prep.Tokenizing),
-        ("Stopword", prep.Stopword),
-        ("Stemming", prep.Stemming),
-        ("Done!", prep.GetDataframe)
-    ]
 
     bench = time.perf_counter()
-    for step in method_step:
-        with placeholder.container():
-            st.write(step[0])
-            res = step[1]()
-
+    with placeholder.container():
+        st.write("Data Cleansing")
+    prep.DataCleansing()
+    with placeholder.container():
+        st.write("Case Folding")
+    prep.CaseFolding()
+    with placeholder.container():
+        st.write("Slang Word")
+    prep.SlangWord()
+    with placeholder.container():
+        st.write("Tokenizing")
+    prep.Tokenizing()
+    with placeholder.container():
+        st.write("Stopword")
+    prep.Stopword()
+    with placeholder.container():
+        st.write("Stemming")
+    prep.Stemming()
+    with placeholder.container():
+        st.write("Done!")
+    res = prep.GetDataframe()
+    del prep
+    
     with st.empty():
         timesTaken = time.perf_counter() - bench
         st.write(f"Total time taken: {timesTaken}")
