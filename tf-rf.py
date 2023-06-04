@@ -30,17 +30,14 @@ def tf_rf(selected, df):
     # Label Encoder TF-RF
     nltk.download('punkt')
     df_TF_RF=ut.TF_RF(df['teks_remove'])
-    
+    st.write(df_TF_RF)
+    st.write(df_TF_RF.columns)
     iterator = 0
     invalid_rows = []
     for index, row in df_TF_RF.iterrows():
         if row.isnull().any():
             invalid_rows.append((index, iterator))
-        iterator += 1
-
-    for i in range(len(invalid_rows)):
-        df_TF_RF.drop(invalid_rows[i][0], inplace=True)
-        df.drop(invalid_rows[i][1], inplace=True)
+            df_TF_RF.loc[index] = 0
 
     st.write("Hasil TF-RF")
     st.write(df_TF_RF)
