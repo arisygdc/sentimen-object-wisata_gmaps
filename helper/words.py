@@ -6,7 +6,7 @@ LIST_HAPUS = [
     'hehehe', 'eh', 'btw', 'sieh', 'dian', 'dir', 'pet', 'an',
     'ituu', 'mak', 'gan', 'bosque', 'ks', 'ig', 'oya', 'up',
     'hahaha', 'ehe', 'ha', 'ha', 'fyi', 'spf', 'bebs', 'mbak',
-    'dll', 'vroff', 'bozzqu', 'ar'
+    'dll', 'vroff', 'bozzqu', 'ar', 'instagramable', 'instagamable'
 ]
 
 LIST_HAPUS_CORPUS = [
