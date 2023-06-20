@@ -45,7 +45,7 @@ class Prepocessing:
 
         list_stopword = set(list_stopword)
         stopword_obj = ut.Stopword(list_stopword)
-        self.dataframe['Stopword'] = self.dataframe['Tokenizing'].apply(stopword_obj.execute)    
+        self.dataframe['Stopword'] = self.dataframe['Tokenizing'].apply(stopword_obj.execute)
 
     def Stemming(self):
         MAX_WORKERS = 4
@@ -92,38 +92,42 @@ if file is not None:
     file = None
     prep = Prepocessing(read_excel)
     del read_excel
-    res = None
-    placeholder = st.empty()
-
+    with st.empty().container():
+        st.write("Uploaded Dataset")
+        st.write(prep.GetDataframe())
     bench = time.perf_counter()
-    with placeholder.container():
+    with st.empty().container():
         st.write("Data Cleansing")
-    prep.DataCleansing()
-    with placeholder.container():
+        prep.DataCleansing()
+        st.write(prep.GetDataframe()['Data_Cleansing'])
+    with st.empty().container():
         st.write("Case Folding")
-    prep.CaseFolding()
-    with placeholder.container():
+        prep.CaseFolding()
+        st.write(prep.GetDataframe()['Case_Folding'])
+    with st.empty().container():
         st.write("Slang Word")
-    prep.SlangWord()
-    with placeholder.container():
+        prep.SlangWord()
+        st.write(prep.GetDataframe())
+    with st.empty().container():
         st.write("Tokenizing")
-    prep.Tokenizing()
-    with placeholder.container():
+        prep.Tokenizing()
+        st.write(prep.GetDataframe()["Tokenizing"])
+    with st.empty().container():
         st.write("Stopword")
-    prep.Stopword()
-    with placeholder.container():
+        prep.Stopword()
+        st.write(prep.GetDataframe()['Stopword'])
+    with st.empty().container():
         st.write("Stemming")
-    prep.Stemming()
-    with placeholder.container():
+        prep.Stemming()
+        st.write(prep.GetDataframe()["Stemming"])
+    with st.empty().container():
         st.write("Done!")
-    res = prep.GetDataframe()
-    del prep
     
-    with st.empty():
+    with st.empty().container():
         timesTaken = time.perf_counter() - bench
         st.write(f"Total time taken: {timesTaken}")
         st.write("Hasil Preprocessing")
-        st.dataframe(res)
+        st.dataframe(prep.GetDataframe())
     
-    fc.checkpoint.SetDataframe(res.copy())
-    del res
+    fc.checkpoint.SetDataframe(prep.GetDataframe().copy())
+    del prep
