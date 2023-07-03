@@ -4,8 +4,6 @@ from nltk.tokenize import word_tokenize
 from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 from nlp_id.stopword import StopWord
 import helper.words as w, nltk
-from nltk.corpus import words
-# import streamlit as st
 
 def Data_Cleansing(text):
     # Hapus non-ascii
@@ -52,17 +50,20 @@ class endict:
 class SlangWords:
     def __init__(self):
         SlangFileList_Path = os.getcwd()+"/dataset/slang_word/"
-        self.dir = os.listdir(SlangFileList_Path)
-        for i in range(len(self.dir)):
-            self.dir[i] = SlangFileList_Path+self.dir[i]
+        self.files = [
+            'colloquial-indonesian-lexicon.csv',
+            'kamus.xlsx'
+        ]
+        for i in range(len(self.files)):
+            self.files[i] = SlangFileList_Path+self.files[i]
         self.dict = {}
 
     def ReadLexicon(self):
-        slang_word = pd.read_csv(self.dir[1])
+        slang_word = pd.read_csv(self.files[0])
         self.dict = pd.Series(slang_word['formal'].values,index=slang_word['slang']).to_dict()
 
     def ReadKamus(self):
-        slang_word = pd.read_excel(self.dir[0])
+        slang_word = pd.read_excel(self.files[1])
         self.dict = pd.Series(slang_word['formal'].values,index=slang_word['slang']).to_dict()
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
     def Slangwords(self, text: str):
@@ -72,12 +73,6 @@ class SlangWords:
         return text
     
     def SlangWords_Series(self, series: pd.Series):
-        # i=0
-        # for _, words in series.items():
-        #     st.write(self.Slangwords(words))
-        #     i+=1
-        #     if i >= 2:
-        #         return
         return series.apply(self.Slangwords)
         
 
