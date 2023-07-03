@@ -17,3 +17,8 @@ icon = "💉"
 path = "tf-rf.py"
 name = "TF RF"
 icon = "💉"
+
+[[pages]]
+path = "predict.py"
+name = "Prediksi Data Baru"
+icon = "💉"

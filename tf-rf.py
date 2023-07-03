@@ -18,7 +18,8 @@ selected_value = {
 }
 
 select_state = None
-selected = st.selectbox("TFRF",selected_value.keys())
+method = "TFRF"
+selected = st.selectbox(method,selected_value.keys())
 placeholder = st.empty()
 init_df = True
 

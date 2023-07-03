@@ -9,3 +9,4 @@ st_pages
 seaborn
 scikit-learn
 wordcloud
+nlp_id

@@ -1,14 +1,19 @@
 import unicodedata, re, os, math
 import pandas as pd, numpy as np
 from nltk.tokenize import word_tokenize
+from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
+from nlp_id.stopword import StopWord
+import helper.words as w, nltk
+from nltk.corpus import words
+# import streamlit as st
 
 def Data_Cleansing(text):
     # Hapus non-ascii
     text = unicodedata.normalize('NFKD', text).encode('ascii', 'ignore').decode('utf-8', 'ignore')
-    
+
     # Menghapus Tanda Baca
     text = re.sub(r'[^\w]|_',' ', text)
-    
+
     # Menghapus Angka
     text = re.sub("\S*\d\S*", "", text).strip()
     text = re.sub(r"\b\d+\b", " ", text)
@@ -32,49 +37,77 @@ def PrepareDataframe(df: pd.DataFrame):
     _=df[df['teks_remove'].str.isspace()==True].index
     return df.drop(df.index[[25, 59, 211, 212, 220, 268, 301, 312, 325, 360]])
 
-class SlangWords:
-    def __init__(self):
-        self.dict = {}
-
-    def ReadCsv(self, path):
-        slang_word = pd.read_csv(path)
-        slang_dict = pd.Series(slang_word['formal'].values,index=slang_word['slang']).to_dict()
-        self.setDict(slang_dict)
-
-    def ReadExcel(self, path):
-        slang_word = pd.read_excel(path)
-        slang_dict = pd.Series(slang_word['formal'].values,index=slang_word['slang']).to_dict()
-        self.setDict(slang_dict)
-        
-    def setDict(self, dict):
-        self.dict = dict
-
-    def Slangwords(self, text):
-        for word in text.split():
+class endict:
+    def __init__(self, ds_path) -> None:
+        path = os.getcwd()+"/"+ds_path
+        eng = pd.read_excel(path)
+        self.dict = pd.Series(eng['indo'].values,index=eng['inggris']).to_dict()
+    
+    def engwords(self, text):
+        for word in text:
             if word in self.dict.keys():
-                text = text.replace(word, self.dict[word])
+                text = [s.replace(word, self.dict[word]) for s in text]
         return text
 
+class SlangWords:
+    def __init__(self):
+        SlangFileList_Path = os.getcwd()+"/dataset/slang_word/"
+        self.dir = os.listdir(SlangFileList_Path)
+        for i in range(len(self.dir)):
+            self.dir[i] = SlangFileList_Path+self.dir[i]
+        self.dict = {}
+
+    def ReadLexicon(self):
+        slang_word = pd.read_csv(self.dir[1])
+        self.dict = pd.Series(slang_word['formal'].values,index=slang_word['slang']).to_dict()
+
+    def ReadKamus(self):
+        slang_word = pd.read_excel(self.dir[0])
+        self.dict = pd.Series(slang_word['formal'].values,index=slang_word['slang']).to_dict()
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
+    def Slangwords(self, text: str):
+        for word in text:
+            if word in self.dict.keys():
+                text = [s.replace(word, self.dict[word]) for s in text]
+        return text
+    
+    def SlangWords_Series(self, series: pd.Series):
+        # i=0
+        # for _, words in series.items():
+        #     st.write(self.Slangwords(words))
+        #     i+=1
+        #     if i >= 2:
+        #         return
+        return series.apply(self.Slangwords)
+        
+
 class Stopword:
-    def __init__(self, list_stopword: set):
+    def __init__(self, list_stopword: set=()):
         self.list_stopword = list_stopword
+        if len(list_stopword)==0:
+            self.list_stopword = self._dataset()
+
+    def _dataset(self):
+        nltk.download('words')
+        stopword = StopWord()
+        list_stopword = stopword.get_stopword()
+        list_stopword.extend(w.LIST_HAPUS)
+        for word in w.LIST_HAPUS_CORPUS:
+            list_stopword.remove(word)
+        return set(list_stopword)
     
     def execute(self, words):
         return [word for word in words if word not in self.list_stopword]   
 
-def RunSlang(path, dataframe: pd.DataFrame) -> pd.DataFrame:
-    slang_obj = SlangWords()
-    SlangFileList_Path = os.getcwd()+"/"+path
-    dir = os.listdir(SlangFileList_Path)
-    for val in reversed(dir):
-        file = SlangFileList_Path+"/"+val
-        if val.endswith(".csv"):
-            slang_obj.ReadCsv(file)
-        if val.endswith(".xlsx"):
-            slang_obj.ReadExcel(file)
-        dataframe['slang_word'] = dataframe['Case_Folding'].apply(slang_obj.Slangwords)
-    return dataframe
+class Stemmer:
+    def __init__(self) -> None:
+        factory = StemmerFactory()
+        self.stemmer = factory.create_stemmer()
     
+    def stem(self, teks):
+        text = [self.stemmer.stem(word) for word in teks]
+        return text
+
 def TF_RF(df_teks):
     # Membuat list kosa kata dari seluruh teks input
     kosa_kata = set()

@@ -3,8 +3,7 @@ import pandas as pd
 import file_checkpoint as fc
 import numpy as np
 import utility as ut
-import sys, nltk, helper.words as w
-from nltk.corpus import stopwords
+import sys, helper.words as w
 import concurrent.futures
 import time
 
@@ -28,24 +27,23 @@ class Prepocessing:
         self.dataframe = self.dataframe.dropna()
         self.dataframe = self.dataframe.reset_index(drop=True)
 
-    def SlangWord(self):
-        self.dataframe = ut.RunSlang("dataset/slang_word", self.dataframe)
-    
     def Tokenizing(self):
-        self.dataframe['Tokenizing'] = self.dataframe['slang_word'].apply(w.split_word)
+        self.dataframe['Tokenizing'] = self.dataframe['Case_Folding'].apply(w.split_word)
+
+    def Translate(self):
+        en_ds = ut.endict('dataset/en_to_id/kamus inggris.xlsx')
+        self.dataframe['eng_word'] = self.dataframe['Tokenizing'].apply(en_ds.engwords)
+
+    def SlangWord(self):
+        slangers = ut.SlangWords()
+        slangers.ReadLexicon()
+        self.dataframe['slang_word'] = slangers.SlangWords_Series(self.dataframe['eng_word'])
+        slangers.ReadKamus()
+        self.dataframe['slang_word'] = slangers.SlangWords_Series(self.dataframe['slang_word'])
     
     def Stopword(self):
-        nltk.download('words')
-        nltk.download('stopwords')
-        listStopword =  list(stopwords.words('indonesian'))
-        list_stopword = listStopword
-        list_stopword.extend(w.LIST_HAPUS)
-        for word in w.LIST_HAPUS_CORPUS:
-            list_stopword.remove(word)
-
-        list_stopword = set(list_stopword)
-        stopword_obj = ut.Stopword(list_stopword)
-        self.dataframe['Stopword'] = self.dataframe['Tokenizing'].apply(stopword_obj.execute)
+        stopword_obj = ut.Stopword()
+        self.dataframe['Stopword'] = self.dataframe['slang_word'].apply(stopword_obj.execute)
 
     def Stemming(self):
         MAX_WORKERS = 4
@@ -78,12 +76,23 @@ class Prepocessing:
                 st.write(f"Start: {start}, End: {end}, Data Carry: {end-start}")
 
         stemProcessVerbose.empty()
+        del stemProcessVerbose
         pool.shutdown(wait=True)
+        del pool
         self.dataframe['teks_remove'] = self.dataframe['Stemming'].apply(ut.satu)
         self.dataframe['teks_remove'] = self.dataframe['teks_remove'].str.findall('\w{2,}').str.join(' ').apply(w.split_word)
+    
+    def FinalCheck(self):
+        self.dataframe['Final_Cek'] = self.dataframe['teks_remove'].apply(ut.satu).drop_duplicates().apply(w.split_word)
+        self.dataframe = self.dataframe.dropna()
+        self.dataframe = self.dataframe.reset_index(drop=True)
         
+    def Untokenizing(self):
+        self.dataframe['Untokenizing'] = self.dataframe['teks_remove'].apply(ut.satu)
+
     def GetDataframe(self) -> pd.DataFrame:
         return self.dataframe
+    
 
 file = None 
 file = st.file_uploader("Upload Dataset", type=["csv", "xlsx"])
@@ -105,13 +114,17 @@ if file is not None:
         prep.CaseFolding()
         st.write(prep.GetDataframe()['Case_Folding'])
     with st.empty().container():
-        st.write("Slang Word")
-        prep.SlangWord()
-        st.write(prep.GetDataframe())
-    with st.empty().container():
         st.write("Tokenizing")
         prep.Tokenizing()
         st.write(prep.GetDataframe()["Tokenizing"])
+    with st.empty().container():
+        st.write("Translate")
+        prep.Translate()
+        st.write(prep.GetDataframe()["eng_word"])
+    with st.empty().container():
+        st.write("Slang Word")
+        prep.SlangWord()
+        st.write(prep.GetDataframe()['slang_word'])
     with st.empty().container():
         st.write("Stopword")
         prep.Stopword()
@@ -120,6 +133,14 @@ if file is not None:
         st.write("Stemming")
         prep.Stemming()
         st.write(prep.GetDataframe()["Stemming"])
+    with st.empty().container():
+        st.write("Final Check")
+        prep.FinalCheck()
+        st.write(prep.GetDataframe()['Final_Cek'])
+    with st.empty().container():
+        st.write("Untokenizing")
+        prep.Untokenizing()
+        st.write(prep.GetDataframe()['Untokenizing'])
     with st.empty().container():
         st.write("Done!")
     

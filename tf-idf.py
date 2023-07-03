@@ -9,6 +9,19 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.metrics import confusion_matrix, accuracy_score
 import seaborn as sns
 
+selected_value = {
+    "50_50":(0.5,110), 
+    "60_40":(0.4, 42), 
+    "70_30":(0.3, 42), 
+    "80_20":(0.2, 42)
+}
+
+select_state = None
+method = "TFIDF"
+selected = st.selectbox(method,selected_value.keys())
+placeholder = st.empty()
+init_df = True
+
 def tf_idf(selected_key: str, df: pd.DataFrame):
     st.write("Hasil Preprocessing")
     df = ut.PrepareDataframe(df)
@@ -107,17 +120,10 @@ def tf_idf(selected_key: str, df: pd.DataFrame):
     st.write("Mean of Training and Testing")
     st.write(reader)
 
-selected_value = {
-    "50_50":(0.5,110), 
-    "60_40":(0.4, 42), 
-    "70_30":(0.3, 42), 
-    "80_20":(0.2, 42)
-}
-
-select_state = None
-selected = st.selectbox("TFIDF",selected_value.keys())
-placeholder = st.empty()
-init_df = True
+    # cmp_var = reader.loc['Testing'].to_list()
+    # is_best_model = fc.best_model.compare_or_save(float(cmp_var[0]), clf, Tfidf_vect, method, selected)
+    # if is_best_model:
+    #     st.write("Saved as best model")
 
 if not fc.checkpoint.CheckDataframe():
     init_df = False

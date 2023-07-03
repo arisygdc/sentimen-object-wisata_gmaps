@@ -1,33 +1,32 @@
 LIST_HAPUS = [
     'https', 'google','diterjemahkan','ga', 'gue', 'lo', 'lu',
     'us', 'kee', 'n', 'pool', 'broo', 'haha', 'wau', 'hehe',
-    'ghaesss', 'pad', 'and', 'lg', 'kna', 'geng', 'wkwk', 
+    'ghaesss', 'pad', 'and', 'lg', 'kna', 'geng', 'wkwk',
     'hmmm', 'deh', 'guys', 'wkwkwkk', 'dii', 'huufff', 'lho',
     'hehehe', 'eh', 'btw', 'sieh', 'dian', 'dir', 'pet', 'an',
     'ituu', 'mak', 'gan', 'bosque', 'ks', 'ig', 'oya', 'up',
     'hahaha', 'ehe', 'ha', 'ha', 'fyi', 'spf', 'bebs', 'mbak',
-    'dll', 'vroff', 'bozzqu', 'ar', 'instagramable', 'instagamable'
+    'dll', 'vroff', 'bozzqu', 'ar','instagramable', 'instagamable',
+    'instagrameble', 'adul', 'abdul', 'job'
 ]
 
 LIST_HAPUS_CORPUS = [
-    'ada', 'adanya', 'agak', 'agaknya',
-    'amat', 'amatlah', 'belum', 'belumlah', 'benar',
-    'benarkah', 'benarlah', 'berlebihan', 'betul',
-    'betulkah', 'besar', 'boleh', 'biasa', 'bolehkah',
-    'bolehlah',  'bukan', 'bukankah', 'bukanlah','bukannya',
-    'cukup', 'cukupkah','cukuplah', 'dekat', 'diberi','diberikan',
-    'diberikannya', 'dibuat', 'dibuatnya', 'didapat','digunakan',
-    'diingat','diingatkan', 'ingat','ingat-ingat','ingin','inginkah',
-    'inginkan', 'jangan','jangankan','janganlah','jauh','kecil', 
-    'kelihatan','kelihatannya','kurang','lama','lamanya','lebih',
-    'makin','mampu', 'masalah','masalahnya','masih','mirip','paling',
-    'panjang','penting','pentingnya', 'percuma','perlu','perlukah',
-    'pihak','pihaknya','punya','rasa','rasanya','sangat','sangatlah',
-    'sebaik','sebaik-baiknya','sebaiknya','sebanyak','sebesar',
-    'sedikit','sedikitnya','sekecil','sekurang-kurangnya','sekurangnya',
-    'semakin', 'semua','semuanya','sering','seringnya','tambah','tambahnya',
-    'tampak','tampaknya','tentu','tentulah','tentunya','tepat','terasa','terbanyak',
-    'teringat','teringat-ingat', 'tidak','tidakkah','tidaklah','tinggi'
+    'gua', 'ada', 'layaknya', 'layaklah', 'dekat', 'datang', 'akurat',
+    'adanya', 'adapun', 'arah', 'baik', 'benar-benar', 'benarlah',
+    'bener-benar','beri', 'berikan', 'betul', 'betulkah', 'bisa',
+    'boleh', 'boleh-boleh', 'bolehkah', 'bolehnya', 'cukup',
+    'cukup-cukup', 'cukupkah', 'cukuplah', 'cukuuppp', 'diingat',
+    'dijamu', 'diperlukan', 'diperlihatkan', 'diperlukannya', 'lebih',
+    'lebih-lebih', 'mendapat', 'mendapatkan', 'meyakinkan', 'penting',
+    'pentingnya', 'sangat', 'sangat-lah', 'sangat-sangat', 'sangatlah',
+    'sungguh', 'sungguh-sungguh', 'tambah', 'tambahnya', 'tepat',
+    'terbanyak', 'teringat', 'teringat-ingat', 'tertarik',
+    'tidak', 'kurang', 'kecil', 'deg', 'deg-degan', 'apesnya', 'belum',
+    'belumlah', 'sedikit', 'bukan', 'bukankah', 'bukanlah', 'bukannya',
+    'agak', 'agak-agak', 'agaknya', 'enyahlah', 'jangan', 'jangankan',
+    'janganlah', 'jarang', 'jarang-jarang', 'jauh', 'keterlaluan',
+    'mirisnya', 'masalah', 'masalahnya', 'wow', 'luar', 'biasa','tempat'
+    , 'oke'
 ]
 
 import pandas as pd
