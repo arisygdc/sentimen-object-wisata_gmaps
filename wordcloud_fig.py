@@ -2,6 +2,12 @@ import streamlit as st
 import file_checkpoint as fc, utility as ut
 import pandas as pd, matplotlib.pyplot as plt
 from wordcloud import WordCloud
+import regex as re
+
+def satu(teks):
+  # Menghapus Tanda Baca
+  text = re.sub(r"[^\w]|_"," ", teks)
+  return text
 
 def PieChart(df: pd.DataFrame):
     fig, ax = plt.subplots(figsize = (6, 6))
@@ -113,8 +119,8 @@ if init_df:
         st.write(fig)
 
         # WORDCLOUD CONTENT SENTIMEN NEGATIF & POSITIVE
-        kata_positif = pd.Series(" ".join(df[df["label"] == 'P']["teks_remove"].apply(ut.satu).astype("str")).split())
-        kata_negatif = pd.Series(" ".join(df[df["label"] == 'N']["teks_remove"].apply(ut.satu).astype("str")).split())
+        kata_positif = pd.Series(" ".join(df[df["label"] == 'P']["teks_remove"].apply(satu).astype("str")).split())
+        kata_negatif = pd.Series(" ".join(df[df["label"] == 'N']["teks_remove"].apply(satu).astype("str")).split())
 
         fig = wordOnPositiveSentiment(kata_positif)
         st.write(fig)
