@@ -5,6 +5,13 @@ from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 from nlp_id.stopword import StopWord
 import helper.words as w, nltk
 
+CURRENT_DIR=os.getcwd()
+
+def rend_path(path:str)->str:
+    if path[0] != "/":
+        path = "/"+path
+    return CURRENT_DIR+path
+
 def Data_Cleansing(text):
     # Hapus non-ascii
     text = unicodedata.normalize('NFKD', text).encode('ascii', 'ignore').decode('utf-8', 'ignore')
@@ -37,7 +44,7 @@ def PrepareDataframe(df: pd.DataFrame):
 
 class endict:
     def __init__(self, ds_path) -> None:
-        path = os.getcwd()+"/"+ds_path
+        path = rend_path(ds_path)
         eng = pd.read_excel(path)
         self.dict = pd.Series(eng['indo'].values,index=eng['inggris']).to_dict()
     
@@ -49,7 +56,7 @@ class endict:
 
 class SlangWords:
     def __init__(self):
-        SlangFileList_Path = os.getcwd()+"/dataset/slang_word/"
+        SlangFileList_Path = rend_path("/dataset/slang_word/")
         self.files = [
             'colloquial-indonesian-lexicon.csv',
             'kamus.xlsx'
